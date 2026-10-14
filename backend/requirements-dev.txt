@@ -1,0 +1,5 @@
+-r requirements.txt
+pytest==9.1.1
+pytest-asyncio==1.4.0
+# reference implementation we check our Mann-Kendall against
+pymannkendall==1.4.3
