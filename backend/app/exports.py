@@ -149,8 +149,9 @@ def report_pdf(doc: dict) -> bytes:
     t = doc["trends"][hz["primary_metric"]]
     rows = [("Definition", doc["definition"])]
     if t.get("enough_data"):
+        adjusted = " (Hamed-Rao adjusted for autocorrelation)" if t["mk"]["autocorrelation_correction"] > 1 else ""
         rows += [
-            ("Mann-Kendall", f"tau = {t['mk']['tau']:.2f}, p = {t['mk']['p']:.3f} (Hamed-Rao adjusted)"),
+            ("Mann-Kendall", f"tau = {t['mk']['tau']:.2f}, p = {t['mk']['p']:.3f}{adjusted}"),
             ("Sen's slope", f"{t['sen']['slope'] * 10:+.2f} per decade (95% CI {t['sen']['lo'] * 10:+.2f} to {t['sen']['hi'] * 10:+.2f})"),
             ("OLS", f"{t['ols']['slope'] * 10:+.2f} per decade, R² = {t['ols']['r2']:.2f}, p = {t['ols']['p']:.3f}"),
         ]

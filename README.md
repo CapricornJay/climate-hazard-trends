@@ -4,8 +4,11 @@ Pick a city, a state or a lat/lon box and see how often it has had heatwaves
 (or heavy-rain days) since 1940, whether that is changing, and how confident
 you can be about the answer.
 
-- **App:** _deploy URL goes here_
-- **API docs:** _deploy URL_/api/docs
+- **App:** https://climate-hazard-trends.ambitiousglacier-2de2de03.eastus2.azurecontainerapps.io/
+- **API docs:** https://climate-hazard-trends.ambitiousglacier-2de2de03.eastus2.azurecontainerapps.io/api/docs
+
+It runs on a scale-to-zero free tier, so if nobody has used it for a while the
+first load takes ~20 seconds.
 
 ![Karnataka, 1990-2020](docs/screenshot.png)
 
