@@ -42,6 +42,25 @@ npm run dev                     # :5173, proxies /api to :8000
 
 `STORAGE=memory` runs the API without Mongo if you just want to poke at it.
 
+### Deployment
+
+The live instance is a single container on **Azure Container Apps** (it
+serves both the API and the built frontend, so there's no CORS in play).
+The database is **Azure Cosmos DB for MongoDB** on its free tier, and the image
+sits in a Basic container registry. `deploy/azure.sh` has the exact commands.
+The app scales to zero when idle, so the first request after a quiet spell
+takes ~20 s while a replica starts.
+
+Two Cosmos quirks the code handles. Its Mongo API historically only allowed
+TTL indexes on its own `_ts` field, so the store falls back to that and
+checks expiry on read anyway. It also has no retryable writes, which the
+connection string turns off.
+
+`render.yaml` deploys the same image to Render with MongoDB Atlas instead, if
+you'd rather not use Azure. `scripts/warm_cache.py` pre-computes a few
+popular regions from your own machine, so the demo doesn't spend the shared
+server's Open-Meteo quota.
+
 ## How it fits together
 
 ```

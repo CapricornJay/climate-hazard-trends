@@ -76,6 +76,7 @@ export default function App() {
   const [year, setYear] = useState<number | null>(null);
   const [, tick] = useState(0);
   const retryTimer = useRef<number | undefined>(undefined);
+  const runRef = useRef<(r: RegionSelection, s: Settings) => void>(() => undefined);
 
   const show = useCallback((a: Analysis) => {
     setAnalysis(a);
@@ -146,12 +147,16 @@ export default function App() {
       // Upstream minute quota: worth waiting for automatically.
       if (err.status === 503 && err.retryAfter && err.retryAfter <= 90) {
         setStatus({ kind: "waiting", message: err.message, until: Date.now() + err.retryAfter * 1000 });
-        retryTimer.current = window.setTimeout(() => run(r, s), err.retryAfter * 1000 + 500);
+        retryTimer.current = window.setTimeout(() => runRef.current(r, s), err.retryAfter * 1000 + 500);
       } else {
         setStatus({ kind: "error", message: err.message || "Something went wrong." });
       }
     }
   }, [region, settings, show]);
+
+  useEffect(() => {
+    runRef.current = (r, s) => void run(r, s);
+  }, [run]);
 
   function pickRegion(r: RegionSelection) {
     setRegion(r);
