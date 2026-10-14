@@ -12,11 +12,14 @@ Collections
 """
 
 import copy
+import logging
 import time
 import zlib
 from datetime import datetime, timedelta, timezone
 
 import numpy as np
+
+log = logging.getLogger(__name__)
 
 MISSING = -32768
 SCALE = 10  # store tenths
@@ -39,6 +42,10 @@ def _now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def _aware(dt: datetime) -> datetime:
+    return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+
+
 class MongoStore:
     def __init__(self, uri: str, db_name: str):
         from pymongo import AsyncMongoClient
@@ -47,8 +54,20 @@ class MongoStore:
         self.db = self.client[db_name]
 
     async def init(self) -> None:
-        await self.db.lookups.create_index("expires_at", expireAfterSeconds=0)
-        await self.db.analyses.create_index("expires_at", expireAfterSeconds=0)
+        from pymongo.errors import OperationFailure
+
+        try:
+            await self.db.lookups.create_index("expires_at", expireAfterSeconds=0)
+            await self.db.analyses.create_index("expires_at", expireAfterSeconds=0)
+        except OperationFailure as exc:
+            # Azure Cosmos DB's Mongo API only allows TTL on its own _ts field.
+            # Expiry is checked on read anyway; _ts TTL just keeps storage tidy.
+            log.info("TTL on expires_at not supported (%s), falling back to _ts", exc.code)
+            for coll, days in ((self.db.lookups, 90), (self.db.analyses, 60)):
+                try:
+                    await coll.create_index("_ts", expireAfterSeconds=days * 86400)
+                except OperationFailure:
+                    log.warning("no TTL index on %s; documents will only expire on read", coll.name)
         await self.db.series.create_index([("source", 1), ("variable", 1)])
 
     async def close(self) -> None:
@@ -69,7 +88,10 @@ class MongoStore:
         await self.db.series.replace_one({"_id": doc["_id"]}, doc, upsert=True)
 
     async def get_analysis(self, analysis_id: str) -> dict | None:
-        return await self.db.analyses.find_one({"_id": analysis_id})
+        doc = await self.db.analyses.find_one({"_id": analysis_id})
+        if doc and doc.get("expires_at") and _aware(doc["expires_at"]) < _now():
+            return None
+        return doc
 
     async def put_analysis(self, doc: dict, ttl_days: int = 60) -> None:
         doc = {**doc, "expires_at": _now() + timedelta(days=ttl_days)}
@@ -77,8 +99,9 @@ class MongoStore:
 
     async def get_lookup(self, key: str):
         doc = await self.db.lookups.find_one({"_id": key})
-        # The TTL monitor only runs once a minute, so check expiry ourselves too.
-        if not doc or doc["expires_at"] < _now():
+        # The TTL monitor only runs once a minute (and Cosmos has none on
+        # custom fields), so check expiry ourselves too.
+        if not doc or _aware(doc["expires_at"]) < _now():
             return None
         return doc["value"]
 
