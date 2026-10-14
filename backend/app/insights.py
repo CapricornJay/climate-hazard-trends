@@ -23,7 +23,9 @@ NOUNS = {
 
 
 def _p(p: float) -> str:
-    return "p < 0.001" if p < 0.001 else f"p = {p:.3f}" if p < 0.01 else f"p = {p:.2f}"
+    # Three decimals near the 0.05 line, otherwise "p = 0.05 (significant)"
+    # shows up for p = 0.0495 and looks like a contradiction.
+    return "p < 0.001" if p < 0.001 else f"p = {p:.3f}" if p < 0.1 else f"p = {p:.2f}"
 
 
 def _pct(v: float) -> str:
@@ -119,6 +121,15 @@ def build(hz: Hazard, p: Params, result: dict, trends: dict, region: dict, quali
             find(f"The wettest day of the year has changed by {slope:+.1f} mm per decade (Sen's slope, {_p(t['mk']['p'])}).")
 
     # --- caveats --------------------------------------------------------
+    if primary.get("enough_data") and primary["mk"]["p"] < 0.05:
+        qp = primary.get("poisson")
+        if qp and qp["pct_per_decade_lo"] < 0 < qp["pct_per_decade_hi"]:
+            caveat(f"The direction of the trend is fairly clear, but its size isn't: the 95% interval for the "
+                   f"change runs from {qp['pct_per_decade_lo']:+.0f}% to {qp['pct_per_decade_hi']:+.0f}% per decade.")
+        elif not qp and primary["sen"]["lo"] < 0 < primary["sen"]["hi"]:
+            caveat("The direction of the trend is fairly clear, but its size isn't: the confidence interval "
+                   "of Sen's slope includes zero.")
+
     if primary.get("enough_data"):
         n = primary["n"]
         if n < 30:

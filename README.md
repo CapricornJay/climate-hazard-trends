@@ -10,7 +10,7 @@ you can be about the answer.
 It runs on a scale-to-zero free tier, so if nobody has used it for a while the
 first load takes ~20 seconds.
 
-![Karnataka, 1990-2020](docs/screenshot.png)
+![Texas, 1990-2020](docs/screenshot.png)
 
 The default view is the one the brief asks for: heatwaves, defined as 3+
 consecutive days with a daily maximum above the 95th percentile, for a region
@@ -226,8 +226,9 @@ Three real results (1990–2020, 1961–1990 thresholds) show the rules at work:
 | region | heatwave days/yr, 1990s → 2011–20 | Mann-Kendall | what the app says |
 |---|---|---|---|
 | Phoenix | 15.1 → 18.5 | p = 0.42 | no clear trend |
-| Paris | 19.6 → 26.4 | p = 0.08 | signs of an increase, weak evidence |
-| Karnataka (state) | 18.1 → 27.3 | p = 0.04 | increased by about 119% since 1990 |
+| Paris | 19.6 → 26.4 | p = 0.077 | signs of an increase, weak evidence |
+| Karnataka (state) | 18.1 → 27.3 | p = 0.041 | increased by about 119% since 1990 |
+| Texas (state) | 20.5 → 37.8 | p = 0.049 | increased by about 111%, *but* the 95% interval for the size runs from −4% to +71% per decade, so the direction is clearer than the magnitude |
 
 A naive "+23% in Phoenix" headline would have been easy to write and wrong
 to believe.

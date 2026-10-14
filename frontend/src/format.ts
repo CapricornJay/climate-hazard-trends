@@ -11,7 +11,7 @@ export function signed(v: number, digits = 1): string {
 
 export function pValue(p: number): string {
   if (p < 0.001) return "p < 0.001";
-  return `p = ${p < 0.01 ? p.toFixed(3) : p.toFixed(2)}`;
+  return `p = ${p < 0.1 ? p.toFixed(3) : p.toFixed(2)}`;
 }
 
 export function shortDate(iso: string): string {

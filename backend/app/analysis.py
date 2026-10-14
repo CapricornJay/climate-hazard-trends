@@ -22,7 +22,7 @@ from .trends import summarize
 log = logging.getLogger(__name__)
 
 # Bump when the hazard/trend logic changes so old cached analyses aren't served.
-ALGO_VERSION = 4
+ALGO_VERSION = 5
 MAX_EVENTS = 3000
 
 SOURCES = {
