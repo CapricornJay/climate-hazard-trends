@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: climate-hazard-trends
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      # Render's proxy appends the caller's IP to X-Forwarded-For.
+      - key: TRUSTED_PROXY_HOPS
+        value: "1"

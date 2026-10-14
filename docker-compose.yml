@@ -1,0 +1,23 @@
+services:
+  mongo:
+    image: mongo:8.0
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      retries: 10
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      MONGODB_URI: mongodb://mongo:27017
+      CORS_ORIGINS: http://localhost:8000,http://localhost:5173
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+volumes:
+  mongo-data:
