@@ -228,7 +228,7 @@ Three real results (1990–2020, 1961–1990 thresholds) show the rules at work:
 | Phoenix | 15.1 → 18.5 | p = 0.42 | no clear trend |
 | Paris | 19.6 → 26.4 | p = 0.077 | signs of an increase, weak evidence |
 | Karnataka (state) | 18.1 → 27.3 | p = 0.041 | increased by about 119% since 1990 |
-| Texas (state) | 20.5 → 37.8 | p = 0.049 | increased by about 111%, *but* the 95% interval for the size runs from −4% to +71% per decade, so the direction is clearer than the magnitude |
+| Texas (state) | 20.5 → 37.8 | p = 0.048 | increased by about 111%, *but* the 95% interval for the size runs from −4% to +71% per decade, so the direction is clearer than the magnitude |
 
 A naive "+23% in Phoenix" headline would have been easy to write and wrong
 to believe.
